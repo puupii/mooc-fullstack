@@ -11,42 +11,46 @@ const App = () => {
     'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients.',
     'The only way to go fast, is to go well.'
   ]
+ 
+  const points = new Uint8Array(anecdotes.length);
+  const [votes, setVotes] = useState(points)
+  const [selected, setSelected] = useState(0)
+
+  const giveRandomAnecdote = () => {
+      return(
+        setSelected(Math.floor( Math.random() * anecdotes.length))
+      )
+    }
+
+  const voteForAnecdote = () => {
+    const copyofpoints = [...votes]
+    copyofpoints[selected] = copyofpoints[selected] + 1
+    console.log(copyofpoints)
+    return(
+        setVotes(copyofpoints)
+    )
+  }
+
     const Button = ({text, handleClick}) => {
-        console.log(text, 'button pressed')
         return (
-            <div>
             <button onClick={handleClick}>
             {text}
             </button>
-            </div>
         )
     }
-   
-  const [selected, setSelected] = useState(0)
-    const giveRandomAnecdote = () => {
-        return(
-            setSelected(Math.floor( Math.random() * anecdotes.length))
-        )
-    }
-
 
   return (
     <div>
       {anecdotes[selected]}
+    <div>
+      has {votes[selected]} votes
+    </div>
+    <div>
+      <Button text="vote" handleClick={voteForAnecdote} />
       <Button text="random anecdote" handleClick={giveRandomAnecdote} />
     </div>
-  )
-}
-      
-
-const Header = ({text}) => {
-  console.log('hello from header', text)
-  return (
-    <div>
-    <h1> {text} </h1>
     </div>
   )
 }
-
 
 export default App
