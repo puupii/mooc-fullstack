@@ -62,8 +62,8 @@ const Content = ({parts}) => {
 }
 
 const Total = ({parts}) => {
-  var total = 0
-  parts.forEach((part) => total = total + part.exercises);
+  var total = parts.reduce((accumulator, currentValue) => accumulator + currentValue.exercises, 0,
+  );
   console.log(total);
   return(
     <div>
