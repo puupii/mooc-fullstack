@@ -117,9 +117,12 @@ const App = () => {
             })
           })
           .catch(error => {
-            alert(
+            setErrorMessage(
               `Name '${personObject.name}' does not exist`
-            )
+            )        
+            setTimeout(() => {          
+              setErrorMessage(null)
+            }, 5000)
             setPersons(persons.filter(n => n.id !==id))
             setShowPersons(persons.filter(n => n.id !==id))
           });
