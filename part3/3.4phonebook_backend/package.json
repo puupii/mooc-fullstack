@@ -1,0 +1,19 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "persons.js",
+  "scripts": {
+    "start": "node persons.js",
+    "dev": "nodemon persons.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ropo",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}
