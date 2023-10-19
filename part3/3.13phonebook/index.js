@@ -28,7 +28,7 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.get('/', (request, response) => {
-  response.send('<h1>Hello World!</h1>')
+  response.send('<h1>Hello from backend!</h1>')
 })
 
 app.get('/api/persons', (request, response) => {
@@ -49,7 +49,6 @@ app.post('/api/persons', (request, response) => {
   }
 
   const person = new Person({
-    id: generateId(),
     name: body.name,
     number: body.number,
   })
@@ -67,12 +66,6 @@ app.post('/api/persons', (request, response) => {
       })
   }
 })
-
-const generateId = () => {
-  const maxId = 10000
-  const newId = Math.floor(Math.random() * maxId);
-  return newId
-}
 
 function personAlreadyInPhonebook(newPerson){
   var id = 'none';
