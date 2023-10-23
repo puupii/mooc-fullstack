@@ -23,6 +23,19 @@ app.get('/', (request, response) => {
   response.send('<h1>Hello from backend!</h1>')
 })
 
+app.get('/api/info', (request, response) => {
+  Person
+    .find({})
+    .then(result => {
+        const number = result.length; 
+        const date = new Date();
+        response.send(
+          `<p>Phonebook has info for ${number} people </p> 
+          <p> ${date} </p>`
+        )
+    })
+})
+
 app.get('/api/persons', (request, response) => {
   Person
     .find({})
