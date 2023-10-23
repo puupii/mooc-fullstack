@@ -93,6 +93,14 @@ const App = () => {
             setErrorMessage(null)
           }, 5000)
         })
+        .catch(error => {
+          console.log(error.response.data.error);
+          setErrorMessage(error.response.data.error.toString());
+        
+          setTimeout(() => {          
+            setErrorMessage(null)
+          }, 5000)
+        })
     } else {
       if (window.confirm(
         `${personObject.name} already in phonebook. Replace old number with ${personObject.number}?`)) {
