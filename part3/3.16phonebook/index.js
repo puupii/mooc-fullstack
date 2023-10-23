@@ -18,12 +18,12 @@ morgan.token('body', function getBody (req) {
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
 
+
 app.get('/', (request, response) => {
   response.send('<h1>Hello from backend!</h1>')
 })
 
 app.get('/api/persons', (request, response) => {
-  console.log('hello');
   Person
     .find({})
     .then(result => {
@@ -82,15 +82,16 @@ app.post('/api/persons', (request, response) => {
   }
 })
 
-app.put('/api/notes/:id', (request, response, next) => {
+app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body
-  console.log(body.id);
+  console.log(request.params.id);
+  const id = request.params.id.toString();
   const person = {
     name: body.name,
     number: body.number,
   }
 
-  Person.findByIdAndUpdate(body.id, person, { new: true })
+  Person.findByIdAndUpdate(id, person, { new: true })
     .then(updatedPerson => {
       response.json(updatedPerson)
     })
@@ -108,6 +109,26 @@ function personAlreadyInPhonebook(newPerson){
   })
   return (id); 
 }
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+// handler of requests with unknown endpoint
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' })
+  } 
+
+  next(error)
+}
+
+// this has to be the last loaded middleware.
+app.use(errorHandler)
 
 const PORT = process.env.PORT 
 app.listen(PORT)
