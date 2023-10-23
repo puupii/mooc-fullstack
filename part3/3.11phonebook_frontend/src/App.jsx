@@ -65,8 +65,7 @@ const App = () => {
       if (JSON.stringify(person.name) === JSON.stringify(newPerson.name)) {
         id = person.id;
       } 
-    }
-    )
+    })
     return (id); 
   }
 
@@ -79,7 +78,7 @@ const App = () => {
     }
     let id  = (personAlreadyInPhonebook(personObject))
     console.log(id)
-    if (id=== 'none'){
+    if (id === 'none'){
       personService
         .create(personObject)
         .then(response => {
