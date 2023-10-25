@@ -148,13 +148,13 @@ const App = () => {
 
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h1>Phonebook</h1>
     <Notification message={errorMessage}/>
     <Filter 
     newfilter={newFilter} 
     handlefilterchange={handleFilterChange} 
     />
-      <h1>add new</h1>
+      <h2>add new</h2>
     <PersonForm 
     addname={addName} 
     newname={newName} 
