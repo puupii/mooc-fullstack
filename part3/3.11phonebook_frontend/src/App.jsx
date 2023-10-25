@@ -148,8 +148,8 @@ const App = () => {
 
   return (
     <div>
-    <Notification message={errorMessage}/>
       <h2>Phonebook</h2>
+    <Notification message={errorMessage}/>
     <Filter 
     newfilter={newFilter} 
     handlefilterchange={handleFilterChange} 
