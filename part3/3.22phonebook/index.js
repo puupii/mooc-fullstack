@@ -1,6 +1,5 @@
 
-require('dotenv').config();
-const http = require('http')
+require('dotenv').config()
 const express = require('express')
 const app = express()
 const cors = require('cors')
@@ -8,15 +7,15 @@ var morgan = require('morgan')
 const Person = require('./models/person')
 
 
-app.use(cors());
-app.use(express.json());
-app.use(express.static('dist'));
+app.use(cors())
+app.use(express.json())
+app.use(express.static('dist'))
 
 morgan.token('body', function getBody (req) {
   return (JSON.stringify(req.body))
 })
 
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 
 app.get('/', (request, response) => {
@@ -27,12 +26,12 @@ app.get('/api/info', (request, response) => {
   Person
     .find({})
     .then(result => {
-        const number = result.length; 
-        const date = new Date();
-        response.send(
-          `<p>Phonebook has info for ${number} people </p> 
+      const number = result.length
+      const date = new Date()
+      response.send(
+        `<p>Phonebook has info for ${number} people </p> 
           <p> ${date} </p>`
-        )
+      )
     })
 })
 
@@ -61,7 +60,7 @@ app.get('/api/persons/:id', (request, response, next) => {
 app.delete('/api/persons/:id', (request, response, next) => {
   Person
     .findByIdAndRemove(request.params.id.toString())
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -71,8 +70,8 @@ app.post('/api/persons', (request, response, next) => {
   const body = request.body
 
   if (!body.name || !body.number) {
-    return response.status(400).json({ 
-      error: 'name or number missing' 
+    return response.status(400).json({
+      error: 'name or number missing'
     })
   }
 
@@ -81,15 +80,15 @@ app.post('/api/persons', (request, response, next) => {
     number: body.number,
   })
 
-  if (personAlreadyInPhonebook(person)!='none'){
-    return response.status(400).json({ 
-      error: 'person already in phonebook' 
+  if (personAlreadyInPhonebook(person)!=='none'){
+    return response.status(400).json({
+      error: 'person already in phonebook'
     })
   } else {
     person
       .save()
-      .then(savedPerson => { 
-      response.json(savedPerson)
+      .then(savedPerson => {
+        response.json(savedPerson)
       })
       .catch(error => next(error))
   }
@@ -97,37 +96,37 @@ app.post('/api/persons', (request, response, next) => {
 
 app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body
-  console.log(request.params.id);
-  const id = request.params.id.toString();
+  console.log(request.params.id)
+  const id = request.params.id.toString()
   const person = {
     name: body.name,
     number: body.number,
   }
 
   Person.findByIdAndUpdate(
-    id, 
-    person, 
-    {new: true, runValidators: true, context: 'query'}
+    id,
+    person,
+    { new: true, runValidators: true, context: 'query' }
   )
     .then(updatedPerson => {
       response.json(updatedPerson)
     })
     .catch(error => {
-      console.log('name is too short');
-      next(error);
+      console.log('name is too short')
+      next(error)
     })
 })
 
 function personAlreadyInPhonebook(newPerson){
-  var id = 'none';
+  var id = 'none'
   Person
     .find({})
     .then(person => {
       if (JSON.stringify(person.name) === JSON.stringify(newPerson.name)) {
-        id = person.id;
-    } 
-  })
-  return (id); 
+        id = person.id
+      }
+    })
+  return (id)
 }
 
 const unknownEndpoint = (request, response) => {
@@ -151,6 +150,6 @@ const errorHandler = (error, request, response, next) => {
 // this has to be the last loaded middleware.
 app.use(errorHandler)
 
-const PORT = process.env.PORT 
+const PORT = process.env.PORT
 app.listen(PORT)
 console.log(`Server running on port ${PORT}`)
