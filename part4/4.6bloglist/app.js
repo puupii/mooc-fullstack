@@ -5,6 +5,7 @@ const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
 const bloglistRouter = require('./controllers/blogs')
+var _ = require('lodash')
 
 app.use(cors())
 app.use(express.json())

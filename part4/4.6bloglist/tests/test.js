@@ -7,6 +7,33 @@ test('dummy returns one', () => {
   expect(result).toBe(1)
 })
 
+describe('total likes', () => {
+  const listWithOneBlog = [
+    {
+      _id: '5a422aa71b54a676234d17f8',
+      title: 'Go To Statement Considered Harmful',
+      author: 'Edsger W. Dijkstra',
+      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+      likes: 5,
+      __v: 0
+    }
+  ]
+  const listWithManyBlogs = require('./many_blogs')
+
+  test('empty list equals zero', () => {
+    const result = listHelper.totalLikes([])
+    expect(result).toBe(0)
+  })
+  test('when list has only one blog, equals the likes of that', () => {
+    const result = listHelper.totalLikes(listWithOneBlog)
+    expect(result).toBe(5)
+  })
+  test('list with many blogs is calculated right', () => {
+    const result = listHelper.totalLikes(listWithManyBlogs)
+    expect(result).toBe(36)
+  })
+})
+
 describe('favorite blog', () => {
   const listWithOneBlog = [
     {
@@ -46,7 +73,9 @@ describe('favorite blog', () => {
     })
   })
 })
-describe('total likes', () => {
+
+describe('author with most blogs', () => {
+
   const listWithOneBlog = [
     {
       _id: '5a422aa71b54a676234d17f8',
@@ -57,20 +86,31 @@ describe('total likes', () => {
       __v: 0
     }
   ]
+
   const listWithManyBlogs = require('./many_blogs')
 
-  test('empty list equals zero', () => {
-    const result = listHelper.totalLikes([])
-    expect(result).toBe(0)
+  test('empty list return undefined', () => {
+    const result = listHelper.mostBlogs([])
+    expect(result).toEqual({
+      author: '',
+      blogs: 0
+    })
   })
-  test('when list has only one blog, equals the likes of that', () => {
-    const result = listHelper.totalLikes(listWithOneBlog)
-    expect(result).toBe(5)
+  test('one blog returns the author of that blog', () => {
+    const result = listHelper.mostBlogs(listWithOneBlog)
+    expect(result).toEqual({
+      author: 'Edsger W. Dijkstra',
+      blogs: 1
+    })
   })
-  test('list with many blogs is calculated right', () => {
-    const result = listHelper.totalLikes(listWithManyBlogs)
-    expect(result).toBe(36)
+  test('finds the author with most blogs in list of blogs', () => {
+    const result = listHelper.mostBlogs(listWithManyBlogs)
+    expect(result).toEqual({
+      author: 'Robert C. Martin',
+      blogs: 3
+    })
   })
 })
+
 
 
