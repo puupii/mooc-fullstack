@@ -7,18 +7,19 @@ test('dummy returns one', () => {
   expect(result).toBe(1)
 })
 
+const listWithOneBlog = [
+  {
+    _id: '5a422aa71b54a676234d17f8',
+    title: 'Go To Statement Considered Harmful',
+    author: 'Edsger W. Dijkstra',
+    url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+    likes: 5,
+    __v: 0
+  }
+]
+const listWithManyBlogs = require('./many_blogs')
+
 describe('total likes', () => {
-  const listWithOneBlog = [
-    {
-      _id: '5a422aa71b54a676234d17f8',
-      title: 'Go To Statement Considered Harmful',
-      author: 'Edsger W. Dijkstra',
-      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-      likes: 5,
-      __v: 0
-    }
-  ]
-  const listWithManyBlogs = require('./many_blogs')
 
   test('empty list equals zero', () => {
     const result = listHelper.totalLikes([])
@@ -35,18 +36,6 @@ describe('total likes', () => {
 })
 
 describe('favorite blog', () => {
-  const listWithOneBlog = [
-    {
-      _id: '5a422aa71b54a676234d17f8',
-      title: 'Go To Statement Considered Harmful',
-      author: 'Edsger W. Dijkstra',
-      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-      likes: 5,
-      __v: 0
-    }
-  ]
-
-  const listWithManyBlogs = require('./many_blogs')
 
   test('empty list equals undefined', () => {
     const result = listHelper.favoriteBlog([])
@@ -75,21 +64,7 @@ describe('favorite blog', () => {
 })
 
 describe('author with most blogs', () => {
-
-  const listWithOneBlog = [
-    {
-      _id: '5a422aa71b54a676234d17f8',
-      title: 'Go To Statement Considered Harmful',
-      author: 'Edsger W. Dijkstra',
-      url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
-      likes: 5,
-      __v: 0
-    }
-  ]
-
-  const listWithManyBlogs = require('./many_blogs')
-
-  test('empty list return undefined', () => {
+  test('empty list returns empty string as author and 0 blogs', () => {
     const result = listHelper.mostBlogs([])
     expect(result).toEqual({
       author: '',

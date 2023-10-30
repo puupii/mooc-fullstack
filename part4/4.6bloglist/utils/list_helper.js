@@ -33,17 +33,17 @@ const mostBlogs = (blogs) => {
   const bloggers = _.countBy(blogs,'author')
   var mostblogs = 0
   var authorWithMostBlogs = ''
-  for (const [key, value] of Object.entries(bloggers)) {
-    if (value > mostblogs) {
-      mostblogs = value
-      authorWithMostBlogs = key
+  for (const [blogger, blogs] of Object.entries(bloggers)) {
+    if (blogs > mostblogs) {
+      mostblogs = blogs
+      authorWithMostBlogs = blogger
     }
   }
   const author = {
     author: authorWithMostBlogs,
     blogs: mostblogs
   }
-  console.log(author)
+
   return author
 }
 
