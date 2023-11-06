@@ -65,6 +65,23 @@ describe('saving to the database', () => {
     )
   }, 15000)
 
+  test('saving a blog without author gives an error', async () => {
+    const newBlog = {
+      title: 'Sipin perunat',
+      url: 'http://www.tietokonepalveluhietaniemi.fi',
+      likes: 0,
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+
+    const response = await api.get('/api/blogs')
+
+    expect(response.body).toHaveLength(helper.initialBlogs.length)
+  }, 15000)
+
   test('saving a blog without title gives an error', async () => {
     const newBlog = {
       author: 'Sipi',
@@ -81,6 +98,26 @@ describe('saving to the database', () => {
 
     expect(response.body).toHaveLength(helper.initialBlogs.length)
   }, 15000)
+
+  test('saving a blog without likes defaults to 0 likes', async() => {
+    const newBlog = {
+      title: 'Cute cats and computers',
+      author: 'Sipi',
+      url: 'http://www.tietokonepalveluhietaniemi.fi',
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAfterSaving = await helper.blogsInDb()
+    const blogsWithSipi = await helper.findBlog({ author: 'Sipi' })
+
+    expect(blogsAfterSaving).toHaveLength(helper.initialBlogs.length +1)
+    expect(blogsWithSipi[0].likes).toBe(0)
+  })
 })
 
 afterAll(async () => {

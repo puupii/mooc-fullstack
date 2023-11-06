@@ -17,6 +17,11 @@ const blogsInDb = async() => {
   return blogs
 }
 
+const findBlog = async(filter) => {
+  const blogs = await Blog.find(filter)
+  return blogs
+}
+
 module.exports = {
-  initialBlogs, nonExistingId, blogsInDb
+  initialBlogs, nonExistingId, blogsInDb, findBlog
 }
