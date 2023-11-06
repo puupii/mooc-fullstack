@@ -65,7 +65,7 @@ describe('saving to the database', () => {
     )
   }, 15000)
 
-  test('saving a blog without author gives an error', async () => {
+  test('saving a blog without author returns 400', async () => {
     const newBlog = {
       title: 'Sipin perunat',
       url: 'http://www.tietokonepalveluhietaniemi.fi',
@@ -82,7 +82,24 @@ describe('saving to the database', () => {
     expect(response.body).toHaveLength(helper.initialBlogs.length)
   }, 15000)
 
-  test('saving a blog without title gives an error', async () => {
+  test('saving a blog without url returns 400', async () => {
+    const newBlog = {
+      title: 'Sipin suolaset pihvit',
+      author: 'Sipi',
+      likes: 11000,
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(400)
+
+    const response = await api.get('/api/blogs')
+
+    expect(response.body).toHaveLength(helper.initialBlogs.length)
+  }, 15000)
+
+  test('saving a blog without title returns 400', async () => {
     const newBlog = {
       author: 'Sipi',
       url: 'http://www.tietokonepalveluhietaniemi.fi',
