@@ -5,6 +5,7 @@ const nonExistingId = async() => {
   const blog = new Blog({
     title: 'non-existing title',
     author: 'non-existing author',
+    url: 'non-existing url',
   })
   await blog.save()
   await blog.deleteOne()

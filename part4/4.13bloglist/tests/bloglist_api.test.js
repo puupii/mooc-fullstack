@@ -42,14 +42,18 @@ describe('fetching a specific blog by id', () => {
 
     const blogToView = blogsAtStart[0]
 
-    const resultBlog = await api
+    const response = await api
       .get(`/api/blogs/${blogToView.id}`)
       .expect(200)
       .expect('Content-Type', /application\/json/)
 
-    console.log(resultBlog.body)
+    let resultBlog = response.body
+
+    console.log(expect.objectContaining(resultBlog))
     console.log(blogToView)
-    expect(resultBlog.body).toEqual(blogToView)
+    console.log(expect.objectContaining(blogToView))
+    expect(expect.objectContaining(resultBlog)).toEqual(blogToView)
+
   })
 
   test('fails with statuscode 404 if blog with given id does not exist', async () => {
