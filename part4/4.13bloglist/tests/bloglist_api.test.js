@@ -47,12 +47,9 @@ describe('fetching a specific blog by id', () => {
       .expect(200)
       .expect('Content-Type', /application\/json/)
 
-    let resultBlog = response.body
+    const resultBlog = response.body
 
-    console.log(expect.objectContaining(resultBlog))
-    console.log(blogToView)
-    console.log(expect.objectContaining(blogToView))
-    expect(expect.objectContaining(resultBlog)).toEqual(blogToView)
+    expect(resultBlog).toEqual(blogToView)
 
   })
 
