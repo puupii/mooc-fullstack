@@ -14,7 +14,7 @@ beforeEach(async () => {
   }
 }, 15000)
 
-mongoose.set('bufferTimeoutMS', 30000)
+mongoose.set('bufferTimeoutMS', 40000)
 
 const api = supertest(app)
 
@@ -40,7 +40,7 @@ describe('fetching a specific blog by id', () => {
   test('succeeds with a valid id', async () => {
     const blogsAtStart = await helper.blogsInDb()
 
-    const blogToView = blogsAtStart[0]
+    const blogToView = blogsAtStart[0].toJSON()
 
     const response = await api
       .get(`/api/blogs/${blogToView.id}`)
@@ -82,12 +82,9 @@ describe('saving to the database', () => {
     const authors = blogsAfterSaving.map(b => b.author)
 
     expect(blogsAfterSaving).toHaveLength(helper.initialBlogs.length +1)
-    expect(authors).toContain(
-      'Sipi'
-    )
-    expect(titles).toContain(
-      'Cute cats and computers'
-    )
+    expect(authors).toContain('Sipi')
+    expect(titles).toContain('Cute cats and computers')
+
   }, 15000)
 
   test('saving a blog without author returns 400', async () => {
@@ -139,6 +136,7 @@ describe('saving to the database', () => {
     const response = await api.get('/api/blogs')
 
     expect(response.body).toHaveLength(helper.initialBlogs.length)
+
   }, 15000)
 
   test('saving a blog without likes defaults to 0 likes', async() => {
@@ -180,6 +178,25 @@ describe('deleting from database', () => {
     const titles = blogsAfterDeleting.map(r => r.title)
 
     expect(titles).not.toContain(blogToDelete.title)
+  })
+})
+
+describe('updating an existing blog', () => {
+  test('succssfully updated the likes of a blog', async () => {
+    const initialBlogs = await helper.blogsInDb()
+    let blogToUpdate = initialBlogs[0].toJSON()
+    blogToUpdate.likes += 11
+
+    const response = await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(blogToUpdate)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const updatedBlog = response.body
+
+    expect(updatedBlog.likes).toEqual(blogToUpdate.likes)
+
   })
 })
 afterAll(async () => {

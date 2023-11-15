@@ -48,5 +48,14 @@ bloglistRouter.delete('/:id',async (request, response) => {
   response.status(204).end()
 })
 
+bloglistRouter.put('/:id',async (request, response) => {
+  const body = request.body
+  const idToUpdate = request.params.id.toString()
+  const blogObject = {
+    ...body
+  }
+  const result = await Blog.findByIdAndUpdate(idToUpdate, blogObject, { returnDocument: 'after' })
+  response.status(201).json(result)
+})
 
 module.exports = bloglistRouter
