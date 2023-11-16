@@ -12,10 +12,15 @@ app.use(cors())
 app.use(express.json())
 
 const mongoUrl = config.MONGODB_URI
-mongoose.connect(mongoUrl)
-  .then(() => {
+async function connection(Url){
+  try {
+    await mongoose.connect(Url)
     logger.info('connected to MongoDB')
-  })
+  } catch (err) {
+    logger.error(err)
+  }
+}
+connection(mongoUrl)
 
 app.use('/api/blogs', bloglistRouter)
 

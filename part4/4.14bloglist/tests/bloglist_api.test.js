@@ -67,7 +67,7 @@ describe('saving to the database', () => {
     const newBlog = {
       title: 'Cute cats and computers',
       author: 'Sipi',
-      url: 'http://www.tietokonepalveluhietaniemi.fi',
+      url: 'http://www.github.com/puupii',
       likes: 10000,
     }
 
@@ -90,7 +90,7 @@ describe('saving to the database', () => {
   test('saving a blog without author returns 400', async () => {
     const newBlog = {
       title: 'Sipin perunat',
-      url: 'http://www.tietokonepalveluhietaniemi.fi',
+      url: 'http://www.github.com/puupii',
       likes: 0,
     }
 
@@ -124,7 +124,7 @@ describe('saving to the database', () => {
   test('saving a blog without title returns 400', async () => {
     const newBlog = {
       author: 'Sipi',
-      url: 'http://www.tietokonepalveluhietaniemi.fi',
+      url: 'http://www.github.com/puupii',
       likes: 10000,
     }
 
@@ -143,7 +143,7 @@ describe('saving to the database', () => {
     const newBlog = {
       title: 'Cute cats and computers',
       author: 'Sipi',
-      url: 'http://www.tietokonepalveluhietaniemi.fi',
+      url: 'http://www.github.com/puupii',
     }
 
     await api
@@ -160,7 +160,7 @@ describe('saving to the database', () => {
   })
 })
 
-describe('deleting from database', () => {
+describe('deleting blogs from database', () => {
   test('succeeds with status code 204 if id is valid', async () => {
     const initialBlogs = await helper.blogsInDb()
     const blogToDelete = initialBlogs[0]
@@ -196,6 +196,20 @@ describe('updating an existing blog', () => {
     const updatedBlog = response.body
 
     expect(updatedBlog.likes).toEqual(blogToUpdate.likes)
+
+  })
+})
+describe('adding users', () => {
+  test('adding a user to database via POST to /api/users', async () => {
+    const newUser = {
+      username: 'ropo',
+      name: 'realropo',
+      password: 'superSecretPassword'
+    }
+    const response = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(201)
 
   })
 })
