@@ -44,8 +44,11 @@ bloglistRouter.post('/',async (request, response) => {
 
 bloglistRouter.delete('/:id',async (request, response) => {
   const idToRemove = request.params.id.toString()
-  await Blog.findByIdAndRemove(idToRemove)
-  response.status(204).end()
+  if (await Blog.findByIdAndRemove(idToRemove)) {
+    response.status(204).end()
+  } else {
+    response.status(404).end()
+  }
 })
 
 bloglistRouter.put('/:id',async (request, response) => {

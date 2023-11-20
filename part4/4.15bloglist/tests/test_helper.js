@@ -1,5 +1,6 @@
 const Blog = require('../models/blogs')
 const initialBlogs = require('./many_blogs')
+const initialUsers = require('./many_users')
 
 const nonExistingId = async() => {
   const blog = new Blog({
@@ -24,5 +25,5 @@ const findBlog = async(filter) => {
 }
 
 module.exports = {
-  initialBlogs, nonExistingId, blogsInDb, findBlog
+  initialBlogs, initialUsers, nonExistingId, blogsInDb, findBlog
 }

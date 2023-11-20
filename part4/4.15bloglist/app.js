@@ -1,11 +1,14 @@
 const config = require('./utils/config')
 const express = require('express')
 require('express-async-errors')
+
 const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose')
 const bloglistRouter = require('./controllers/blogs')
+const usersRouter = require('./controllers/users')
 const logger = require('./utils/logger')
+
 var _ = require('lodash')
 
 app.use(cors())
@@ -23,5 +26,6 @@ async function connection(Url){
 connection(mongoUrl)
 
 app.use('/api/blogs', bloglistRouter)
+app.use('/api/users', usersRouter)
 
 module.exports = app

@@ -4,13 +4,19 @@ const app = require('../app')
 const helper = require('./test_helper')
 
 const Blog = require('../models/blogs')
+const User = require('../models/user')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
 
   for (let blog of helper.initialBlogs) {
     let blogObject = new Blog(blog)
     await blogObject.save()
+  }
+  for (let user of helper.initialUsers) {
+    let userObject = new User(user)
+    await userObject.save()
   }
 }, 15000)
 
@@ -179,40 +185,116 @@ describe('deleting blogs from database', () => {
 
     expect(titles).not.toContain(blogToDelete.title)
   })
+
+  test('fails with status code 404 if id is invalid', async () => {
+    const idToDelete = await helper.nonExistingId()
+
+    await api
+      .delete(`/api/blogs/${idToDelete}`)
+      .expect(404)
+
+    const blogsAfterDeleting = await helper.blogsInDb()
+
+    expect(blogsAfterDeleting).toHaveLength(helper.initialBlogs.length)
+
+  })
 })
 
 describe('updating an existing blog', () => {
-  test('succssfully updated the likes of a blog', async () => {
+
+  test('succssfully updated the author of a blog', async () => {
     const initialBlogs = await helper.blogsInDb()
     let blogToUpdate = initialBlogs[0].toJSON()
-    blogToUpdate.likes += 11
+    blogToUpdate.author = 'New Author'
 
-    const response = await api
+    await api
       .put(`/api/blogs/${blogToUpdate.id}`)
       .send(blogToUpdate)
       .expect(201)
       .expect('Content-Type', /application\/json/)
 
-    const updatedBlog = response.body
+    const blogAfterUpdate = await Blog.findById(blogToUpdate.id)
 
-    expect(updatedBlog.likes).toEqual(blogToUpdate.likes)
+    expect(blogAfterUpdate.author).toEqual(blogToUpdate.author)
+  })
 
+  test('succssfully updated the title of a blog', async () => {
+    const initialBlogs = await helper.blogsInDb()
+    let blogToUpdate = initialBlogs[0].toJSON()
+    blogToUpdate.title = 'New Title'
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(blogToUpdate)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const blogAfterUpdate = await Blog.findById(blogToUpdate.id)
+
+    expect(blogAfterUpdate.title).toEqual(blogToUpdate.title)
+  })
+
+  test('succssfully updated the likes of a blog', async () => {
+    const initialBlogs = await helper.blogsInDb()
+    let blogToUpdate = initialBlogs[0].toJSON()
+    blogToUpdate.likes += 11
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(blogToUpdate)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const blogAfterUpdate = await Blog.findById(blogToUpdate.id)
+
+    expect(blogAfterUpdate.likes).toEqual(blogToUpdate.likes)
   })
 })
+
 describe('adding users', () => {
   test('adding a user to database via POST to /api/users', async () => {
+    const initialUsers = helper.initialUsers
+
     const newUser = {
-      username: 'ropo',
-      name: 'realropo',
-      password: 'superSecretPassword'
+      username: 'newRopo',
+      name: 'realerRopo',
+      password: 'password123'
     }
-    const response = await api
+
+    const postResponse = await api
       .post('/api/users')
       .send(newUser)
       .expect(201)
 
+    const addedUser = postResponse.body
+
+    const getResponse = await api
+      .get('/api/users')
+      .expect(200)
+
+    const listOfUsers = getResponse.body
+    expect(listOfUsers.length).toEqual(initialUsers.length +1)
+    expect(addedUser.username).toEqual(newUser.username)
+    expect(addedUser.name).toEqual(newUser.name)
+    //password should not be in the response
+    expect(addedUser.password).not.toEqual(newUser.password)
   })
 })
+
+describe('getting users', () => {
+  test('GET-request to /api/users/ returns list of users', async () => {
+    const intialUsers = helper.initialUsers
+
+    const response = await api
+      .get('/api/users')
+      .expect(200)
+
+    const listOfUsers = response.body
+
+    expect(listOfUsers.length).toEqual(intialUsers.length)
+  })
+})
+
 afterAll(async () => {
   await mongoose.connection.close()
 })
