@@ -5,6 +5,8 @@ const helper = require('./test_helper')
 
 const Blog = require('../models/blogs')
 const User = require('../models/user')
+const api = supertest(app)
+mongoose.set('bufferTimeoutMS', 40000)
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -19,10 +21,6 @@ beforeEach(async () => {
     await userObject.save()
   }
 }, 15000)
-
-mongoose.set('bufferTimeoutMS', 40000)
-
-const api = supertest(app)
 
 describe('connection and formatting', () => {
   test('blogs are returned as json', async () => {
@@ -251,49 +249,6 @@ describe('updating an existing blog', () => {
   })
 })
 
-describe('adding users', () => {
-  test('adding a user to database via POST to /api/users', async () => {
-    const initialUsers = helper.initialUsers
-
-    const newUser = {
-      username: 'newRopo',
-      name: 'realerRopo',
-      password: 'password123'
-    }
-
-    const postResponse = await api
-      .post('/api/users')
-      .send(newUser)
-      .expect(201)
-
-    const addedUser = postResponse.body
-
-    const getResponse = await api
-      .get('/api/users')
-      .expect(200)
-
-    const listOfUsers = getResponse.body
-    expect(listOfUsers.length).toEqual(initialUsers.length +1)
-    expect(addedUser.username).toEqual(newUser.username)
-    expect(addedUser.name).toEqual(newUser.name)
-    //password should not be in the response
-    expect(addedUser.password).not.toEqual(newUser.password)
-  })
-})
-
-describe('getting users', () => {
-  test('GET-request to /api/users/ returns list of users', async () => {
-    const intialUsers = helper.initialUsers
-
-    const response = await api
-      .get('/api/users')
-      .expect(200)
-
-    const listOfUsers = response.body
-
-    expect(listOfUsers.length).toEqual(intialUsers.length)
-  })
-})
 
 afterAll(async () => {
   await mongoose.connection.close()
