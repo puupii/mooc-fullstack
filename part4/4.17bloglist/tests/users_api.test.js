@@ -13,13 +13,14 @@ beforeEach(async () => {
   await Blog.deleteMany({})
   await User.deleteMany({})
 
-  for (let blog of helper.initialBlogs) {
-    let blogObject = new Blog(blog)
-    await blogObject.save()
-  }
   for (let user of helper.initialUsers) {
     let userObject = new User(user)
     await userObject.save()
+  }
+  for (let blog of helper.initialBlogs) {
+    let blogObject = new Blog(blog)
+    blogObject.user = (await helper.usersInDb())[0].id
+    await blogObject.save()
   }
 }, 15000)
 
@@ -87,6 +88,7 @@ describe('getting users', () => {
     const response = await api
       .get('/api/users')
       .expect(200)
+      .expect('Content-Type', /application\/json/)
 
     const listOfUsers = response.body
 

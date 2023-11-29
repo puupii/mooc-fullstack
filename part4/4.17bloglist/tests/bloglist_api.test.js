@@ -12,14 +12,18 @@ beforeEach(async () => {
   await Blog.deleteMany({})
   await User.deleteMany({})
 
-  for (let blog of helper.initialBlogs) {
-    let blogObject = new Blog(blog)
-    await blogObject.save()
-  }
   for (let user of helper.initialUsers) {
     let userObject = new User(user)
     await userObject.save()
   }
+
+  for (let blog of helper.initialBlogs) {
+    let blogObject = new Blog(blog)
+    const userId = (await helper.usersInDb())[0].id
+    blogObject.user = userId
+    await blogObject.save()
+  }
+
 }, 15000)
 
 describe('connection and formatting', () => {
@@ -40,6 +44,7 @@ describe('connection and formatting', () => {
     expect(response.body[0].id).toBeDefined()
   }, 15000)
 })
+
 describe('fetching a specific blog by id', () => {
   test('succeeds with a valid id', async () => {
     const blogsAtStart = await helper.blogsInDb()
@@ -52,6 +57,7 @@ describe('fetching a specific blog by id', () => {
       .expect('Content-Type', /application\/json/)
 
     const resultBlog = response.body
+    delete blogToView.user[0].blogs
 
     expect(resultBlog).toEqual(blogToView)
 
@@ -68,11 +74,13 @@ describe('fetching a specific blog by id', () => {
 
 describe('saving to the database', () => {
   test('saving a new blog succesfull', async () => {
+    const userId = (await helper.usersInDb())[0].id
     const newBlog = {
       title: 'Cute cats and computers',
       author: 'Sipi',
       url: 'http://www.github.com/puupii',
       likes: 10000,
+      userId: userId,
     }
 
     await api
@@ -92,10 +100,12 @@ describe('saving to the database', () => {
   }, 15000)
 
   test('saving a blog without author returns 400', async () => {
+    const userId = (await helper.usersInDb())[0].id
     const newBlog = {
       title: 'Sipin perunat',
       url: 'http://www.github.com/puupii',
       likes: 0,
+      userId: userId,
     }
 
     await api
@@ -109,10 +119,12 @@ describe('saving to the database', () => {
   }, 15000)
 
   test('saving a blog without url returns 400', async () => {
+    const userId = (await helper.usersInDb())[0].id
     const newBlog = {
       title: 'Sipin suolaset pihvit',
       author: 'Sipi',
       likes: 11000,
+      userId: userId,
     }
 
     await api
@@ -126,10 +138,12 @@ describe('saving to the database', () => {
   }, 15000)
 
   test('saving a blog without title returns 400', async () => {
+    const userId = (await helper.usersInDb())[0].id
     const newBlog = {
       author: 'Sipi',
       url: 'http://www.github.com/puupii',
       likes: 10000,
+      userId: userId,
     }
 
     await api
@@ -144,10 +158,12 @@ describe('saving to the database', () => {
   }, 15000)
 
   test('saving a blog without likes defaults to 0 likes', async() => {
+    const userId = (await helper.usersInDb())[0].id
     const newBlog = {
       title: 'Cute cats and computers',
       author: 'Sipi',
       url: 'http://www.github.com/puupii',
+      userId: userId
     }
 
     await api
@@ -202,8 +218,10 @@ describe('updating an existing blog', () => {
 
   test('succssfully updated the author of a blog', async () => {
     const initialBlogs = await helper.blogsInDb()
-    let blogToUpdate = initialBlogs[0].toJSON()
+    let blogToUpdate = initialBlogs[0]
     blogToUpdate.author = 'New Author'
+    blogToUpdate.userId = blogToUpdate.user.id
+    delete blogToUpdate.user
 
     await api
       .put(`/api/blogs/${blogToUpdate.id}`)
@@ -218,8 +236,9 @@ describe('updating an existing blog', () => {
 
   test('succssfully updated the title of a blog', async () => {
     const initialBlogs = await helper.blogsInDb()
-    let blogToUpdate = initialBlogs[0].toJSON()
+    let blogToUpdate = initialBlogs[0]
     blogToUpdate.title = 'New Title'
+    blogToUpdate.userId = blogToUpdate.user.id
 
     await api
       .put(`/api/blogs/${blogToUpdate.id}`)
@@ -234,8 +253,9 @@ describe('updating an existing blog', () => {
 
   test('succssfully updated the likes of a blog', async () => {
     const initialBlogs = await helper.blogsInDb()
-    let blogToUpdate = initialBlogs[0].toJSON()
+    let blogToUpdate = initialBlogs[0]
     blogToUpdate.likes += 11
+    blogToUpdate.userId = blogToUpdate.user.id
 
     await api
       .put(`/api/blogs/${blogToUpdate.id}`)

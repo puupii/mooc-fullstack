@@ -1,6 +1,7 @@
-const Blog = require('../models/blogs')
+
 const initialBlogs = require('./many_blogs')
 const initialUsers = require('./many_users')
+const Blog = require('../models/blogs')
 const User = require('../models/user')
 
 
@@ -17,22 +18,26 @@ const nonExistingId = async() => {
 }
 
 const usersInDb = async() => {
-  const users = await User.find({})
+  const users = await User
+    .find({}).populate('blogs')
   return users
 }
 
 const findUser = async(filter) => {
-  const users = await User.find(filter)
+  const users = await User
+    .find(filter).populate('blogs')
   return users
 }
 
 const blogsInDb = async() => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog
+    .find({}).populate('user',{ username: 1, name: 1 })
   return blogs
 }
 
 const findBlog = async(filter) => {
-  const blogs = await Blog.find(filter)
+  const blogs = await Blog
+    .find(filter).populate('user',{ username: 1, name: 1 })
   return blogs
 }
 

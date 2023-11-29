@@ -1,15 +1,17 @@
 const bloglistRouter = require('express').Router()
 const Blog = require('../models/blogs')
-
+const User = require('../models/user')
 
 bloglistRouter.get('/',async (request, response) => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog
+    .find({}).populate('user',{ username: 1, name: 1 })
   response.json(blogs)
 })
 
 bloglistRouter.get('/:id', async (request, response) => {
   const id = request.params.id
-  const blog = await Blog.findById(id)
+  const blog = await Blog
+    .findById(id).populate('user',{ username: 1, name: 1 })
   if (blog) {
     response.json(blog)
   } else {
@@ -19,26 +21,27 @@ bloglistRouter.get('/:id', async (request, response) => {
 
 bloglistRouter.post('/',async (request, response) => {
   const body = request.body
+  const user = await User.findById(body.userId)
 
   if (!body.title || !body.author || !body.url) {
     return response.status(400).json({
       error: 'blog has no author, title or url'
     })
-  }
-
-  if(!body.likes) {
-
-    body['likes'] = 0
-
-    let blog = new Blog(body)
-    const result = await blog.save()
-    response.status(201).json(result)
 
   } else {
+    const blog = new Blog({
+      title: body.title,
+      url: body.url,
+      author: body.author,
+      likes: body.likes === undefined ? 0 : body.likes,
+      user: user.id
+    })
 
-    let blog = new Blog(body)
-    const result = await blog.save()
-    response.status(201).json(result)
+    const savedBlog = await blog.save()
+    user.blogs = user.blogs.concat(savedBlog.id)
+    await user.save()
+
+    response.status(201).json(savedBlog)
   }
 })
 
@@ -53,9 +56,16 @@ bloglistRouter.delete('/:id',async (request, response) => {
 
 bloglistRouter.put('/:id',async (request, response) => {
   const body = request.body
+  console.log(body)
   const idToUpdate = request.params.id.toString()
+  const user = await User.findById(body.userId)
   const blogObject = {
-    ...body
+    id: body.id,
+    title: body.title,
+    url: body.url,
+    author: body.author,
+    likes: body.likes,
+    user: user.id
   }
   const result = await Blog.findByIdAndUpdate(idToUpdate, blogObject, { returnDocument: 'after' })
   response.status(201).json(result)
