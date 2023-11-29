@@ -38,7 +38,7 @@ connection(mongoUrl)
 
 app.use(middleware.extractToken)
 
-app.use('/api/blogs', bloglistRouter)
+app.use('/api/blogs', middleware.extractUser, bloglistRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
 
