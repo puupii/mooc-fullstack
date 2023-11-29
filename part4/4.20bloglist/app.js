@@ -36,6 +36,8 @@ logger.info('connecting to', config.MONGODB_URI)
 
 connection(mongoUrl)
 
+app.use(middleware.extractToken)
+
 app.use('/api/blogs', bloglistRouter)
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
@@ -43,5 +45,6 @@ app.use('/api/login', loginRouter)
 app.use(middleware.unknownEndpoint)
 app.use(middleware.errorHandler)
 app.use(middleware.requestLogger)
+
 
 module.exports = app
