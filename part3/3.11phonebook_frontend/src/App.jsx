@@ -55,9 +55,9 @@ const App = () => {
           setTimeout(() => {          
             setErrorMessage(null)
           }, 5000)
-    });
-    };
-  };
+    })
+    }
+  }
   
   function personAlreadyInPhonebook(newPerson){
     var id = 'none';
@@ -122,19 +122,21 @@ const App = () => {
               setErrorMessage(null)
             }, 5000)
             })
+            setPersons(persons.filter(n => n.id !==id))
+            setShowPersons(persons.filter(n => n.id !==id))
           })
           .catch(error => {
+            console.log(error.response.data.error);
             setErrorMessage(
-              `Name '${personObject.name}' does not exist`
-            )        
+              `Number must be at least 8 digits and format XXX-XXXXX` 
+            );
             setTimeout(() => {          
               setErrorMessage(null)
             }, 5000)
-            setPersons(persons.filter(n => n.id !==id))
-            setShowPersons(persons.filter(n => n.id !==id))
-          });
-      };
-  };
+            return
+          })
+      }
+  }
 }
   
   const personsToShow = (newFilter) => {

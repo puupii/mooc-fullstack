@@ -1,5 +1,5 @@
 {
-  "name": "3.21phonebook",
+  "name": "3.22phonebook",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:ui": "rm -rf dist && cd ../3.11phonebook_frontend/ && npm run build && cp -r dist ../3.21phonebook",
+    "build:ui": "rm -rf dist && cd ../3.11phonebook_frontend/ && npm run build && cp -r dist ../3.22phonebook",
     "deploy": "fly deploy",
     "deploy:full": "npm run build:ui && npm run deploy",
     "logs:prod": "fly logs",

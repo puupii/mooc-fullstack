@@ -112,7 +112,7 @@ app.put('/api/persons/:id', (request, response, next) => {
       response.json(updatedPerson)
     })
     .catch(error => {
-      console.log('name is too short')
+      console.log('number is too short')
       next(error)
     })
 })
