@@ -1,3 +1,4 @@
+
 const bloglistRouter = require('express').Router()
 const Blog = require('../models/blogs')
 const User = require('../models/user')
@@ -23,6 +24,10 @@ bloglistRouter.get('/:id', async (request, response) => {
 bloglistRouter.post('/',async (request, response) => {
   const body = request.body
   const user = await User.findById(request.user)
+
+  if (!user) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
 
   if (!body.title || !body.author || !body.url) {
     return response.status(400).json({
@@ -51,6 +56,14 @@ bloglistRouter.delete('/:id',async (request, response) => {
   const user = await User.findById(request.user)
   const blogToRemove = await Blog.findById(idToRemove)
 
+  if (!blogToRemove) {
+    response.status(404).end()
+  }
+
+  if (!user) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+
   if (blogToRemove.user.toString() !== user.id.toString()) {
     return response.status(401).json({ error: 'only user who created the blog can delete it' })
   }
@@ -67,6 +80,10 @@ bloglistRouter.put('/:id',async (request, response) => {
   const idToUpdate = request.params.id.toString()
   const user = await User.findById(request.user)
   const blogToUpdate = await Blog.findById(idToUpdate)
+
+  if (!user) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
 
   if (blogToUpdate.user.toString() !== user.id.toString()) {
     return response.status(401).json({ error: 'only user who created the blog can update it' })

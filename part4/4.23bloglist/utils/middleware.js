@@ -20,7 +20,7 @@ const errorHandler = (error, request, response, next) => {
     return response.status(400).send({ error: 'malformatted id' })
   } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message })
-  } else if (error.name ===  'JsonWebTokenError') {
+  } else if (error.name === 'JsonWebTokenError') {
     return response.status(401).json({ error: error.message })
   }
 
@@ -36,12 +36,12 @@ const extractToken = (request, response, next) => {
 }
 
 const extractUser = (request, response, next) => {
-  const decodedToken = jwt.verify(request.token, process.env.SECRET)
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
+  if (request.token){
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (decodedToken.id) {
+      request.user = decodedToken.id
+    }
   }
-  request.user = decodedToken.id
-
   next()
 }
 

@@ -8,6 +8,8 @@ const User = require('../models/user')
 const api = supertest(app)
 mongoose.set('bufferTimeoutMS', 40000)
 
+let logintoken = ''
+
 beforeEach(async () => {
   await Blog.deleteMany({})
   await User.deleteMany({})
@@ -23,6 +25,13 @@ beforeEach(async () => {
     blogObject.user = userId
     await blogObject.save()
   }
+  const response= await api
+    .post('/api/login')
+    .send({
+      username: 'ropo',
+      password: 'superSecretPassword'
+    })
+  logintoken = 'Bearer ' + response.body.token
 
 }, 15000)
 
@@ -73,7 +82,7 @@ describe('fetching a specific blog by id', () => {
 })
 
 describe('saving to the database', () => {
-  test('saving a new blog succesfull', async () => {
+  test('saving a new blog without token returns 401', async () => {
     const userId = (await helper.usersInDb())[0].id
     const newBlog = {
       title: 'Cute cats and computers',
@@ -85,6 +94,33 @@ describe('saving to the database', () => {
 
     await api
       .post('/api/blogs')
+      .send(newBlog)
+      .expect(401)
+
+    const blogsAfterSaving = await helper.blogsInDb()
+    const titles = blogsAfterSaving.map(b => b.title)
+    const authors = blogsAfterSaving.map(b => b.author)
+
+    expect(blogsAfterSaving).toHaveLength(helper.initialBlogs.length)
+    expect(authors).not.toContain('Sipi')
+    expect(titles).not.toContain('Cute cats and computers')
+
+  }, 15000)
+
+  test('saving a new blog succesfull', async () => {
+    const userId = (await helper.usersInDb())[0].id
+    const newBlog = {
+      title: 'Cute cats and computers',
+      author: 'Sipi',
+      url: 'http://www.github.com/puupii',
+      likes: 10000,
+      userId: userId,
+    }
+
+    console.log(logintoken)
+    await api
+      .post('/api/blogs')
+      .set('Authorization', logintoken)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -110,6 +146,7 @@ describe('saving to the database', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', logintoken)
       .send(newBlog)
       .expect(400)
 
@@ -129,6 +166,7 @@ describe('saving to the database', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', logintoken)
       .send(newBlog)
       .expect(400)
 
@@ -148,6 +186,7 @@ describe('saving to the database', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', logintoken)
       .send(newBlog)
       .expect(400)
 
@@ -168,6 +207,7 @@ describe('saving to the database', () => {
 
     await api
       .post('/api/blogs')
+      .set('Authorization', logintoken)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -187,6 +227,7 @@ describe('deleting blogs from database', () => {
 
     await api
       .delete(`/api/blogs/${blogToDelete.id}`)
+      .set('Authorization', logintoken)
       .expect(204)
 
     const blogsAfterDeleting = await helper.blogsInDb()
@@ -200,11 +241,26 @@ describe('deleting blogs from database', () => {
     expect(titles).not.toContain(blogToDelete.title)
   })
 
+  test('fails with status code 401 if token is invalid', async () => {
+    const initialBlogs = await helper.blogsInDb()
+    const blogToDelete = initialBlogs[0]
+
+    await api
+      .delete(`/api/blogs/${blogToDelete.id}`)
+      .expect(401)
+
+    const blogsAfterDeleting = await helper.blogsInDb()
+
+    expect(blogsAfterDeleting).toHaveLength(helper.initialBlogs.length)
+
+  })
+
   test('fails with status code 404 if id is invalid', async () => {
     const idToDelete = await helper.nonExistingId()
 
     await api
       .delete(`/api/blogs/${idToDelete}`)
+      .set('Authorization', logintoken)
       .expect(404)
 
     const blogsAfterDeleting = await helper.blogsInDb()
